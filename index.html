@@ -1,0 +1,361 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Guard - URL Detection</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #071426, #102c4c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            padding: 35px;
+            background: #132941;
+            border: 1px solid #294762;
+            border-radius: 18px;
+            box-shadow: 0 10px 40px #0005;
+        }
+
+        h1 {
+            text-align: center;
+            color: #42d9ff;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #c2d2e2;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #496781;
+            background: #071a2d;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #42d9ff;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            background: #00bde8;
+            color: #061426;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #62e3ff;
+        }
+
+        #result {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .safe {
+            background: #123d32;
+            border: 1px solid #2bd69a;
+        }
+
+        .danger {
+            background: #4a2029;
+            border: 1px solid #ff6477;
+        }
+
+        .warning {
+            background: #49391b;
+            border: 1px solid #ffc857;
+        }
+
+        .result-title {
+            font-size: 21px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .details {
+            line-height: 1.8;
+        }
+
+        .algorithms {
+            margin-top: 25px;
+            padding: 15px;
+            background: #0b2035;
+            border-radius: 10px;
+        }
+
+        .algorithms h3 {
+            color: #42d9ff;
+        }
+
+        .footer {
+            text-align: center;
+            color: #9bb2c9;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h1>🛡️ URL Guard</h1>
+        <p class="subtitle">
+            Suspicious URL Detection System
+        </p>
+
+        <label for="urlInput">Enter a website URL</label>
+
+        <input
+            type="text"
+            id="urlInput"
+            placeholder="https://example.com"
+            autocomplete="url"
+        >
+
+        <button onclick="scanURL()">Scan URL</button>
+
+        <section id="result" aria-live="polite">
+            <div class="result-title" id="resultTitle"></div>
+            <div class="details" id="resultDetails"></div>
+        </section>
+
+        <section class="algorithms">
+            <h3>Detection Algorithms</h3>
+            <p>
+                <strong>1. URL Feature-Based Detection:</strong>
+                Checks URL length, IP-address hosts, unusual characters,
+                and suspicious patterns.
+            </p>
+            <p>
+                <strong>2. Heuristic Detection:</strong>
+                Looks for warning signs such as misleading hostnames,
+                unusual domains, and suspicious URL terms.
+            </p>
+        </section>
+
+        <p class="footer">
+            Educational prototype · Not a substitute for a security scanner
+        </p>
+    </main>
+
+    <script>
+        function scanURL() {
+            const input = document.getElementById("urlInput").value.trim();
+            const result = document.getElementById("result");
+            const title = document.getElementById("resultTitle");
+            const details = document.getElementById("resultDetails");
+
+            result.style.display = "block";
+
+            if (!input) {
+                showResult("warning", "⚠️ Enter a URL",
+                    "Please enter a website URL to scan.");
+                return;
+            }
+
+            let url;
+
+            try {
+                url = new URL(
+                    /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(input)
+                        ? input
+                        : "https://" + input
+                );
+
+                if (!["http:", "https:"].includes(url.protocol)) {
+                    throw new Error("Unsupported protocol");
+                }
+            } catch (error) {
+                showResult("warning", "⚠️ Invalid URL",
+                    "Enter a valid HTTP or HTTPS website URL.");
+                return;
+            }
+
+            const hostname = url.hostname.toLowerCase();
+            const fullURL = url.href.toLowerCase();
+
+            let score = 0;
+            const reasons = [];
+
+            // Algorithm 1: URL feature-based detection
+
+            if (fullURL.length > 100) {
+                score += 1;
+                reasons.push("Unusually long URL");
+            }
+
+            if (/^(\\d{1,3}\\.){3}\\d{1,3}$/.test(hostname)) {
+                score += 2;
+                reasons.push("URL uses an IP address as its host");
+            }
+
+            if (url.protocol !== "https:") {
+                score += 1;
+                reasons.push("Connection does not use HTTPS");
+            }
+
+            if (hostname.includes("xn--")) {
+                score += 2;
+                reasons.push("Hostname contains an internationalized domain label");
+            }
+
+            if ((fullURL.match(/@/g) || []).length > 0) {
+                score += 2;
+                reasons.push("URL contains an @ symbol");
+            }
+
+            // Algorithm 2: Heuristic detection
+
+            const suspiciousWords = [
+                "login-verify",
+                "account-suspended",
+                "password-reset",
+                "free-prize",
+                "claim-reward",
+                "urgent-verification"
+            ];
+
+            if (suspiciousWords.some(word => fullURL.includes(word))) {
+                score += 2;
+                reasons.push("Contains suspicious URL wording");
+            }
+
+            if (hostname.split(".").length >= 5) {
+                score += 1;
+                reasons.push("Hostname has many subdomains");
+            }
+
+            const trustedLookingNames = [
+                "paypal", "google", "microsoft", "amazon", "apple"
+            ];
+
+            const brandImpersonation = trustedLookingNames.some(brand =>
+                hostname.includes(brand) &&
+                !(
+                    hostname === brand + ".com" ||
+                    hostname.endsWith("." + brand + ".com") ||
+                    hostname === brand + ".org" ||
+                    hostname.endsWith("." + brand + ".org")
+                )
+            );
+
+            if (brandImpersonation) {
+                score += 2;
+                reasons.push("Possible misleading brand name in hostname");
+            }
+
+            // Display an estimated result, not a confirmed verdict.
+
+            if (score >= 4) {
+                showResult(
+                    "danger",
+                    "🚨 High-Risk Indicators Found",
+                    "This URL has several suspicious characteristics."
+                );
+            } else if (score >= 2) {
+                showResult(
+                    "warning",
+                    "⚠️ Suspicious Indicators Found",
+                    "Review this URL carefully before opening it."
+                );
+            } else {
+                showResult(
+                    "safe",
+                    "🔎 No Major Warning Signs Detected",
+                    "This heuristic scan found few warning signs. " +
+                    "This does NOT prove that the URL is safe."
+                );
+            }
+
+            details.innerHTML +=
+                "<p><strong>URL:</strong> " +
+                escapeHTML(url.href) + "</p>" +
+                "<p><strong>Heuristic score:</strong> " +
+                score + "</p>" +
+                "<p><strong>Findings:</strong></p>";
+
+            if (reasons.length === 0) {
+                details.innerHTML +=
+                    "<p>No configured warning patterns were detected.</p>";
+            } else {
+                details.innerHTML += "<ul>" +
+                    reasons.map(reason =>
+                        "<li>" + escapeHTML(reason) + "</li>"
+                    ).join("") +
+                    "</ul>";
+            }
+
+            details.innerHTML +=
+                "<p><strong>Note:</strong> This is a basic local " +
+                "heuristic scan, not a live malware or phishing database check.</p>";
+        }
+
+        function showResult(type, heading, message) {
+            const result = document.getElementById("result");
+            result.className = type;
+            document.getElementById("resultTitle").textContent = heading;
+            document.getElementById("resultDetails").textContent = message;
+        }
+
+        function escapeHTML(text) {
+            return text.replace(/[&<>"']/g, char => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[char]);
+        }
+
+        document.getElementById("urlInput").addEventListener(
+            "keydown",
+            function(event) {
+                if (event.key === "Enter") {
+                    scanURL();
+                }
+            }
+        );
+    </script>
+</body>
+</html>
+```
