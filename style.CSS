@@ -1,0 +1,151 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: #f1f5f9;
+    background: linear-gradient(135deg, #071426, #102c4c);
+}
+
+.container {
+    width: 100%;
+    max-width: 650px;
+    padding: 32px;
+    border: 1px solid #294762;
+    border-radius: 18px;
+    background: #132941;
+    box-shadow: 0 10px 40px #0005;
+}
+
+.shield {
+    text-align: center;
+    font-size: 42px;
+}
+
+h1 {
+    text-align: center;
+    color: #42d9ff;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #c2d2e2;
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #496781;
+    border-radius: 8px;
+    background: #071a2d;
+    color: white;
+    font-size: 16px;
+}
+
+input:focus {
+    outline: 2px solid #42d9ff;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #00bde8;
+    color: #061426;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #62e3ff;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#status {
+    overflow-wrap: anywhere;
+}
+
+.result {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+
+.result h2 {
+    font-size: 21px;
+}
+
+.danger {
+    background: #4a2029;
+    border: 1px solid #ff6477;
+}
+
+.warning {
+    background: #49391b;
+    border: 1px solid #ffc857;
+}
+
+.safe {
+    background: #123d32;
+    border: 1px solid #2bd69a;
+}
+
+.algorithm-box {
+    margin-top: 25px;
+    padding: 18px;
+    background: #0b2035;
+    border-radius: 10px;
+    line-height: 1.6;
+}
+
+.algorithm-box h2 {
+    color: #42d9ff;
+    font-size: 19px;
+}
+
+.note {
+    color: #c2d2e2;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer {
+    margin-top: 25px;
+    text-align: center;
+    color: #9bb2c9;
+    font-size: 12px;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 12px;
+    }
+
+    .container {
+        padding: 22px;
+    }
+}
